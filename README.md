@@ -10,12 +10,13 @@ githubusercontent.com 文件夹放的是 \*.githubusercontent.com/\* 的反代
 
 部署完后，在设置中，找到绑定域名和路由，选择绑定路由
 
-创建两个路由，然后选择你的域名 \*youdoiname.com/\* 和 youdoiname.com/\*
+创建两个路由，然后选择你的域名 \*yourdomain.com/\* 和 yourdomain.com/\*
 
 最后在DNS中填入优选IP
 
-youdoiname.com      这里填入优选的IP(你可以使用我的cf.0721233.xyz) 
-
-*youdoiname.com     这里填入优选的IP(你可以使用我的cf.0721233.xyz) 
+| 域名 | DNS记录值 |
+|------|-----------|
+| yourdomain.com | 这里填入优选的IP(你可以使用我的cf.0721233.xyz) |
+| *yourdomain.com | 这里填入优选的IP(你可以使用我的cf.0721233.xyz) |
 
 # 详细教程请见我[博客](https://codfish.top/posts/proxy-gitHub-with-cloudflare/)。
