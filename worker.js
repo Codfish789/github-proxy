@@ -16,7 +16,7 @@ const DANGEROUS_PATHS = [
 // GitHub域名映射规则
 const GITHUB_DOMAINS = {
   'github.com': '6github.com',
-  'raw.githubusercontent.com': '6githubusercontent.com',
+  'raw.githubusercontent.com': 'raw.6githubusercontent.com',
   'gist.github.com': 'gist.6github.com',
   'codeload.github.com': 'codeload.6github.com',
   'api.github.com': 'api.6github.com',
