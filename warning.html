@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>内容警告 - GitHub加速服务</title>
+    <title>内容警告 - 6GitHub加速服务</title>
     <style>
         :root {
             --primary-color: #dc2626; /* 红色作为警告主色调 */
@@ -127,6 +127,9 @@
             position: relative;
             overflow: hidden;
             z-index: 1;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
         }
         
         .button::before {
@@ -159,6 +162,11 @@
         .button.secondary:hover {
             background-color: #4b5563;
             box-shadow: 0 10px 20px -5px rgba(75, 85, 99, 0.4);
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
         }
         
         .reasons {
@@ -202,15 +210,6 @@
             animation: fadeIn calc(var(--animation-duration) * 2) ease-out;
         }
         
-        /* 倒计时样式 */
-        .countdown {
-            font-size: 2rem;
-            font-weight: bold;
-            text-align: center;
-            margin: 20px 0;
-            color: var(--primary-color);
-        }
-        
         @media (max-width: 768px) {
             .container {
                 padding: 0 15px;
@@ -239,8 +238,9 @@
                 <p>该内容可能违反了GitHub的服务条款或我们的加速服务使用规定。为了保护您和我们的服务，我们已阻止了对该内容的访问。</p>
             </div>
             
-            <div class="countdown" id="countdown">10</div>
-            <p style="text-align: center;">秒后将自动返回首页</p>
+            <div class="button-container">
+                <button class="button" onclick="window.location.href='index.html'">返回首页</button>
+            </div>
         </div>
         
         <div class="reasons">
@@ -274,23 +274,8 @@
         </div>
         
         <footer>
-            <p>© 2023 GitHub 加速服务 | 本服务仅用于学习研究，请遵守相关法律法规</p>
+            <p>© 2025 GitHub 加速服务 | 本服务仅用于学习研究，请遵守相关法律法规</p>
         </footer>
     </div>
-    
-    <script>
-        // 倒计时功能
-        let seconds = 10;
-        const countdownElement = document.getElementById('countdown');
-        const countdownInterval = setInterval(() => {
-            seconds--;
-            countdownElement.textContent = seconds;
-            
-            if (seconds <= 0) {
-                clearInterval(countdownInterval);
-                window.location.href = 'index.html';
-            }
-        }, 1000);
-    </script>
 </body>
 </html>
