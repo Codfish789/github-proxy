@@ -3,6 +3,11 @@ export default {
     const url = new URL(request.url);
     const hostname = url.hostname;
     
+    // 检测到 user-images.6githubusercontent.com 时重定向到警告页面
+    if (hostname === 'user-images.6githubusercontent.com') {
+      return Response.redirect('https://help.6github.com/warning', 302);
+    }
+    
     // 确定目标域名
     let targetHostname;
     
