@@ -1,0 +1,2 @@
+使用cloudflare worker加速GitHub
+部署完后，使用路由功能优选IP
