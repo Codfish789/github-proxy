@@ -16,7 +16,7 @@ githubusercontent.com 文件夹放的是 \*.githubusercontent.com/\* 的反代
 
 | 域名 | DNS记录值 |
 |------|-----------|
-| yourdomain.com | 这里填入优选的IP(你可以使用我的cf.0721233.xyz) |
+| yourdomain.com | 这里填入优选的IP(你可以使用我的cname-flattening.0721233.xyz) |
 | *yourdomain.com | 这里填入优选的IP(你可以使用我的cf.0721233.xyz) |
 
 # 详细教程请见我[博客](https://codfish.top/posts/proxy-gitHub-with-cloudflare/)。
