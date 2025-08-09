@@ -3,6 +3,8 @@ export default {
     // 配置变量
     const PROXY_DOMAIN = '6github.com';
     const TARGET_DOMAIN = 'github.com';
+    const PROXY_USERCONTENT_DOMAIN = '6githubusercontent.com';
+    const TARGET_GITHUBUSERCONTENT_DOMAIN = 'githubusercontent.com';
     const HELP_BASE_URL = 'https://help.6github.com';
     const HELP_HOME_URL = `${HELP_BASE_URL}/`;
     const HELP_WARNING_URL = `${HELP_BASE_URL}/warning`;
@@ -116,6 +118,15 @@ export default {
               }
               responseHeaders.set('Location', locationUrl.toString());
             }
+            // 处理 githubusercontent.com 重定向
+            else if (locationUrl.hostname.endsWith(`.${TARGET_GITHUBUSERCONTENT_DOMAIN}`) || locationUrl.hostname === TARGET_GITHUBUSERCONTENT_DOMAIN) {
+              if (locationUrl.hostname === TARGET_GITHUBUSERCONTENT_DOMAIN) {
+                locationUrl.hostname = PROXY_USERCONTENT_DOMAIN;
+              } else {
+                locationUrl.hostname = locationUrl.hostname.replace(`.${TARGET_GITHUBUSERCONTENT_DOMAIN}`, `.${PROXY_USERCONTENT_DOMAIN}`);
+              }
+              responseHeaders.set('Location', locationUrl.toString());
+            }
           } catch (e) {
             // 如果Location不是有效URL，保持原样
           }
@@ -131,8 +142,14 @@ export default {
         const githubUrlPattern = new RegExp(`https://${TARGET_DOMAIN.replace('.', '\\.')}`, 'g');
         const githubSubdomainPattern = new RegExp(`https://([^\\s"']+)\\.${TARGET_DOMAIN.replace('.', '\\.')}`, 'g');
         
+        // 替换 githubusercontent.com 链接
+        const usercontentUrlPattern = new RegExp(`https://${TARGET_GITHUBUSERCONTENT_DOMAIN.replace('.', '\\.')}`, 'g');
+        const usercontentSubdomainPattern = new RegExp(`https://([^\\s"']+)\\.${TARGET_GITHUBUSERCONTENT_DOMAIN.replace('.', '\\.')}`, 'g');
+        
         html = html.replace(githubUrlPattern, `https://${PROXY_DOMAIN}`);
         html = html.replace(githubSubdomainPattern, `https://$1.${PROXY_DOMAIN}`);
+        html = html.replace(usercontentUrlPattern, `https://${PROXY_USERCONTENT_DOMAIN}`);
+        html = html.replace(usercontentSubdomainPattern, `https://$1.${PROXY_USERCONTENT_DOMAIN}`);
         
         return new Response(html, {
           status: response.status,
