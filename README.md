@@ -1,6 +1,9 @@
 # 使用cloudflare worker加速GitHub
+
 ## 特点
+
 使用cloudflare worker代理，无需任何额外费用，只需一个域名，一个账户
+
 使用worker路由功能 整域代理，不会出现GitHub更新后，新增子域导致无法及时代理
 
 # 或者直接使用我已搭建好的 [6GitHub](https://6github.com/) 加速站
