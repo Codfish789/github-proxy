@@ -33,7 +33,12 @@ export default {
     
     // 处理特定路径的重定向
     if (pathname === '/') {
-      return Response.redirect(HELP_HOME_URL, 302);
+      // 主域名重定向到首页，子域名重定向到警告页面
+      if (hostname === PROXY_DOMAIN) {
+        return Response.redirect(HELP_HOME_URL, 302);
+      } else if (hostname.endsWith(`.${PROXY_DOMAIN}`)) {
+        return Response.redirect(HELP_WARNING_URL, 302);
+      }
     }
     
     if (WARNING_PATHS.includes(pathname)) {

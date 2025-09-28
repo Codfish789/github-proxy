@@ -4,15 +4,24 @@ export default {
     const PROXY_DOMAIN = '6githubusercontent.com';
     const TARGET_DOMAIN = 'githubusercontent.com';
     const HELP_WARNING_URL = 'https://help.6github.com/warning';
+    const MAX_REQUEST_SIZE = 50 * 1024 * 1024; // 50MB 限制
     
     // 需要重定向到警告页面的子域名
     const WARNING_PATHS = ['user-images'];
     
-    // CORS 配置
+    // 严格的域名验证正则表达式
+    const VALID_DOMAIN_PATTERN = new RegExp(`^([a-zA-Z0-9-]+\\.)?${PROXY_DOMAIN.replace('.', '\\.')}$`);
+    const MAIN_DOMAIN_PATTERN = new RegExp(`^${PROXY_DOMAIN.replace('.', '\\.')}$`);
+    
+    // 预编译的正则表达式用于内容替换
+    const TARGET_DOMAIN_PATTERN = new RegExp(`https?://${TARGET_DOMAIN.replace('.', '\\.')}`, 'g');
+    const TARGET_SUBDOMAIN_PATTERN = new RegExp(`https?://([^.\\s]+)\\.${TARGET_DOMAIN.replace('.', '\\.')}`, 'g');
+    
+    // 更安全的CORS配置
     const CORS_HEADERS = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': '*'
+      'Access-Control-Allow-Origin': 'https://github.com',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With'
     };
     
     // 需要移除的安全头部
@@ -27,6 +36,22 @@ export default {
     
     const url = new URL(request.url);
     const hostname = url.hostname;
+    
+    // 严格验证域名格式
+    if (!VALID_DOMAIN_PATTERN.test(hostname)) {
+      return new Response('Invalid domain', { status: 403 });
+    }
+    
+    // 检查请求大小限制
+    const contentLength = request.headers.get('content-length');
+    if (contentLength && parseInt(contentLength) > MAX_REQUEST_SIZE) {
+      return new Response('Request too large', { status: 413 });
+    }
+    
+    // 只对主域名进行根路径重定向，保留子域名的正常功能
+    if (MAIN_DOMAIN_PATTERN.test(hostname) && url.pathname === '/') {
+      return Response.redirect(HELP_WARNING_URL, 302);
+    }
     
     // 检查是否是需要重定向到警告页面的子域名
     const subdomain = hostname.replace(`.${PROXY_DOMAIN}`, '');
@@ -72,12 +97,9 @@ export default {
         const location = newHeaders.get('location');
         let newLocation = location;
         
-        // 替换目标域名相关域名为代理域名
-        const targetDomainPattern = new RegExp(`https?://${TARGET_DOMAIN.replace('.', '\\.')}`, 'g');
-        const targetSubdomainPattern = new RegExp(`https?://([^.]+)\\.${TARGET_DOMAIN.replace('.', '\\.')}`, 'g');
-        
-        newLocation = newLocation.replace(targetDomainPattern, `https://${PROXY_DOMAIN}`);
-        newLocation = newLocation.replace(targetSubdomainPattern, `https://$1.${PROXY_DOMAIN}`);
+        // 使用预编译的正则表达式替换域名
+        newLocation = newLocation.replace(TARGET_DOMAIN_PATTERN, `https://${PROXY_DOMAIN}`);
+        newLocation = newLocation.replace(TARGET_SUBDOMAIN_PATTERN, `https://$1.${PROXY_DOMAIN}`);
         
         newHeaders.set('location', newLocation);
       }
@@ -107,12 +129,9 @@ export default {
       if (isTextContent) {
         let content = await response.text();
         
-        // 替换内容中的目标域名引用为代理域名
-        const contentTargetDomainPattern = new RegExp(`https?://${TARGET_DOMAIN.replace('.', '\\.')}`, 'g');
-        const contentTargetSubdomainPattern = new RegExp(`https?://([^.\\s]+)\\.${TARGET_DOMAIN.replace('.', '\\.')}`, 'g');
-        
-        content = content.replace(contentTargetDomainPattern, `https://${PROXY_DOMAIN}`);
-        content = content.replace(contentTargetSubdomainPattern, `https://$1.${PROXY_DOMAIN}`);
+        // 使用预编译的正则表达式替换内容中的域名引用
+        content = content.replace(TARGET_DOMAIN_PATTERN, `https://${PROXY_DOMAIN}`);
+        content = content.replace(TARGET_SUBDOMAIN_PATTERN, `https://$1.${PROXY_DOMAIN}`);
         
         return new Response(content, {
           status: response.status,
@@ -129,11 +148,13 @@ export default {
       });
       
     } catch (error) {
-      return new Response('代理请求失败: ' + error.message, {
-        status: 500,
+      // 改进的错误处理，避免泄露敏感信息
+      console.error('Proxy error:', error);
+      return new Response('Proxy service temporarily unavailable', {
+        status: 502,
         headers: {
           'Content-Type': 'text/plain; charset=utf-8',
-          'Access-Control-Allow-Origin': '*'
+          'Access-Control-Allow-Origin': 'https://github.com'
         }
       });
     }
